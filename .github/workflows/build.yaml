@@ -19,6 +19,34 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes pipe-operators
 
-      - run: nix flake check
-      - run: nix build .#default
-      - run: nix build .#image
+      - name: Static checks for the nix flake
+        run: nix flake check
+
+      - name: Build binary artifact
+        run: nix build .#default -o result
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: system-x86_64-linux
+          path: result/bin/system
+          if-no-files-found: error
+
+      - name: Build container image
+        run: nix build .#image -o result-image
+
+      - name: Tag container image
+        run: |
+          IMAGE=$(docker load < result-image | sed -n 's/^Loaded image: //p')
+          REPO="ghcr.io/${GITHUB_REPOSITORY,,}"
+
+          docker tag "$IMAGE" "$REPO:${GITHUB_SHA}"
+
+      - name: GHCR login
+        run: echo $GHCR_TOKEN | docker login ghcr.io -u $USER_NAME --password-stdin
+
+      - name: GHCR push
+        run: |
+          REPO="ghcr.io/${GITHUB_REPOSITORY,,}"
+
+          docker push "$REPO:${GITHUB_SHA}"
+
