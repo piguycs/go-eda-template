@@ -17,7 +17,7 @@
 
     forAllSystems = f:
       systems
-      |> lib.genAttrs (system: import nixpkgs { inherit system; })
+      |> (systems: lib.genAttrs systems (system: import nixpkgs { inherit system; }))
       |> lib.mapAttrs (_: pkgs: f pkgs);
 
     makePackage = pkgs:
