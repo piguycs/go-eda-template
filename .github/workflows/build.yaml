@@ -1,4 +1,4 @@
-name: "CI"
+name: Build
 
 on:
   pull_request:
@@ -21,3 +21,4 @@ jobs:
 
       - run: nix flake check
       - run: nix build .#default
+      - run: nix build .#image

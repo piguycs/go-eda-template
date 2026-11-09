@@ -1,0 +1,4 @@
+# nix build outputs
+# the default output is result, result-* can be created by users
+result
+result-*
