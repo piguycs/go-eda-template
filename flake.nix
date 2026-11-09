@@ -34,8 +34,17 @@
       };
 
   in {
-    packages = forAllSystems (pkgs: {
-      default = makePackage pkgs;
+    packages = forAllSystems (pkgs: let
+      package = makePackage pkgs;
+    in {
+      default = package;
+
+      image = pkgs.dockerTools.buildLayeredImage {
+        name = "go-eda-template";
+        tag = "latest";
+
+        config.Cmd = [ "${package}/bin/system" ];
+      };
     });
   };
 }
