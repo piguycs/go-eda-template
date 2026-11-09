@@ -41,7 +41,7 @@
 
       image = pkgs.dockerTools.buildLayeredImage {
         name = "go-eda-template";
-        tag = "latest";
+        tag = "${nixpkgs.rev}";
 
         config.Cmd = [ "${package}/bin/system" ];
       };
